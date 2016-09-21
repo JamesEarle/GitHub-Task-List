@@ -1,0 +1,18 @@
+{
+    "manifest_version": 2,
+
+    "name": "GitHub Task List",
+    "description": "Add issue details to GitHub task lists",
+    "version": "1.0",
+    "content_scripts": [{
+        "matches": ["https://github.com/*/*/issues/*"],
+        "js": ["jquery-2.1.0.min.js", "index.js"]
+    }],
+    "browser_action": {
+        "default_icon": "icon.png"
+    },
+    "permissions": [
+        "activeTab",
+        "https://ajax.googleapis.com/"
+    ]
+}
