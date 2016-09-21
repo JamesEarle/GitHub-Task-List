@@ -17,7 +17,8 @@ function makeStateButton(state, isIssue) {
             " + state + "</span>";
 }
 
-// Refresh the page when an input is checked to maintain the state buttons
+// Might want to refresh the page when an input is checked to maintain the state buttons
+// this is buggy right now though
 // $("input:checkbox").change(function() {
 //     setTimeout(function() {}, 500)
 //     location.reload();
@@ -31,12 +32,10 @@ var checklist = document.querySelectorAll("li.task-list-item");
 
 if (checklist.length != 0) {
 
-    var dict = {};
-
     console.log("Fetching information on issues and pull requests...");
 
+    // Collect children elements for the containing div
     for (var i = 0; i < checklist.length; i++) {
-        // Collect children elements for the containing div
         var children = checklist[i].childNodes;
 
         // We need to find <input> and <a>
@@ -53,21 +52,15 @@ if (checklist.length != 0) {
         var checkbox = elems[0];
         var anchor = elems[1];
 
-        dict[anchor] = checklist[i];
-
         (function(anchor) {
             $.ajax({
                 url: anchor.href,
                 type: 'GET',
                 context: checklist[i],
                 success: function(data) {
-                    // do check for pull vs. issue
+                    // Find state button in requested HTML
                     var state = $(data).find("div.state")[0].classList[1];
                     
-                    // console.log("key 2 " + anchor.href);        
-                    // console.log(anchor.href.search("issue"));
-                    
-                    // console.log($(this)[0])
                     switch (state) {
                         case "state-open":
                             anchor.insertAdjacentHTML("beforebegin", makeStateButton("Open"));
@@ -89,50 +82,5 @@ if (checklist.length != 0) {
             });
         })(anchor);
     };
-
-    // for(var key in dict) {
-        // console.log("key 1" + key);
-        // console.log(dict[key]);
-
-        // (function(key) {
-        //     $.ajax({
-        //         url: key,
-        //         type: 'GET',
-        //         context: dict[key],
-        //         success: function(data) {
-        //             // do check for pull vs. issue
-        //             var state = $(data).find("div.state")[0].classList[1];
-                    
-        //             console.log("key 2" + key);        
-        //             console.log(key.search("issue"));
-
-        //             if(key.search("issue") > 0) {
-        //                 //issue
-        //             } else {
-        //                 //pull request
-        //             }
-
-        //             console.log($(this)[0])
-        //             switch (state) {
-        //                 case "state-open":
-        //                     // anchor.insertAdjacentHTML("beforebegin", makeStateButton("Open"));
-        //                     // anchor.insertAdjacentHTML("beforebegin", "<span> </span>");
-        //                     console.log("openn");
-        //                     break;
-        //                 case "state-closed":
-        //                     // anchor.insertAdjacentHTML("beforebegin", makeStateButton("Closed"));
-        //                     // anchor.insertAdjacentHTML("beforebegin", "<span> </span>");
-        //                     console.log("closedd")
-        //                     break;
-        //                 case "state-merged":
-        //                     // anchor.insertAdjacentHTML("beforebegin", makeStateButton("Merged"));
-        //                     // anchor.insertAdjacentHTML("beforebegin", "<span> </span>");
-        //                     console.log("mergedd")
-        //                     break;
-        //             }
-        //         }
-        //     });
-        // })(key);
-    // }
     console.log("Finished!")
 }
