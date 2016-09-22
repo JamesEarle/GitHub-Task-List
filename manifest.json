@@ -3,9 +3,9 @@
 
     "name": "GitHub Task List",
     "description": "Add issue details to GitHub task lists",
-    "version": "1.3.5",
+    "version": "1.4.1",
     "content_scripts": [{
-        "matches": ["https://github.com/*/*/issues/*"],
+        "matches": ["https://github.com/*"],
         "js": ["jquery-2.1.0.min.js", "index.js"]
     }],
     "browser_action": {

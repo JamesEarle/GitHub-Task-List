@@ -27,60 +27,62 @@ function makeStateButton(state, isIssue) {
 // See below for PATCH API requests that can open/close issues dynamically
 // https://developer.github.com/v3/issues/
 
-// Find task list
-var checklist = document.querySelectorAll("li.task-list-item");
 
-if (checklist.length != 0) {
+function collectLinks() {
+    // Find task list
+    var checklist = document.querySelectorAll("a.issue-link");
 
-    console.log("Fetching information on issues and pull requests...");
+    if (checklist.length != 0) {
+        console.log("Fetching information on issues and pull requests...");
 
-    // Collect children elements for the containing div
-    for (var i = 0; i < checklist.length; i++) {
-        var children = checklist[i].childNodes;
-
-        // We need to find <input> and <a>
-        var elems = []
-        for (var j = 0; j < children.length; j++) {
-            if (children[j].tagName == "INPUT") {
-                elems.push(children[j]);
-            } else if (children[j].tagName == "A") {
-                elems.push(children[j]);
-            }
-        }
-
-        // This assumes we find always find checkbox first (proper structure)
-        var checkbox = elems[0];
-        var anchor = elems[1];
-
-        (function(anchor) {
-            $.ajax({
-                url: anchor.href,
-                type: 'GET',
-                context: checklist[i],
-                success: function(data) {
-                    // Find state button in requested HTML
-                    var state = $(data).find("div.state")[0].classList[1];
-                    
-                    switch (state) {
-                        case "state-open":
-                            anchor.insertAdjacentHTML("beforebegin", makeStateButton("Open"));
-                            anchor.insertAdjacentHTML("beforebegin", "<span> </span>");
-                            console.log("openn");
-                            break;
-                        case "state-closed":
-                            anchor.insertAdjacentHTML("beforebegin", makeStateButton("Closed"));
-                            anchor.insertAdjacentHTML("beforebegin", "<span> </span>");
-                            console.log("closedd")
-                            break;
-                        case "state-merged":
-                            anchor.insertAdjacentHTML("beforebegin", makeStateButton("Merged"));
-                            anchor.insertAdjacentHTML("beforebegin", "<span> </span>");
-                            console.log("mergedd")
-                            break;
+        // Collect children elements for the containing div
+        for (var i = 0; i < checklist.length; i++) {
+            (function(anchor) {
+                $.ajax({
+                    url: anchor.href,
+                    type: 'GET',
+                    context: checklist[i],
+                    success: function(data) {
+                        // Find state button in requested HTML
+                        var state = $(data).find("div.state")[0].classList[1];
+                        
+                        switch (state) {
+                            case "state-open":
+                                anchor.insertAdjacentHTML("beforebegin", makeStateButton("Open"));
+                                anchor.insertAdjacentHTML("beforebegin", "<span> </span>");
+                                break;
+                            case "state-closed":
+                                anchor.insertAdjacentHTML("beforebegin", makeStateButton("Closed"));
+                                anchor.insertAdjacentHTML("beforebegin", "<span> </span>");
+                                break;
+                            case "state-merged":
+                                anchor.insertAdjacentHTML("beforebegin", makeStateButton("Merged"));
+                                anchor.insertAdjacentHTML("beforebegin", "<span> </span>");
+                                break;
+                        }
                     }
-                }
-            });
-        })(anchor);
-    };
-    console.log("Finished!")
+                });
+            })(checklist[i]);
+        };
+        console.log("Finished!");
+    }
 }
+
+$(document).ready(function() {
+    // Call once, in case we start on an issues page
+    collectLinks();  
+});
+
+// For the rest of the session wait for navigation
+var oldUrl = window.location.href;
+setInterval(function() {
+    // Detect navigation in GitHub's "one-page" structure
+    if(window.location.href != oldUrl) {
+        oldUrl = window.location.href;
+        // if collectLinks() is called too quickly the HTML won't have
+        // rendered properly and it will say it has found no a.issue-link
+        collectLinks();
+    }
+}, 1000);  
+
+
