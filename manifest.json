@@ -3,11 +3,16 @@
 
     "name": "GitHub Task List",
     "description": "Add issue details to GitHub task lists",
-    "version": "1.4.1",
+    "version": "1.4.2",
     "content_scripts": [{
         "matches": ["https://github.com/*"],
         "js": ["jquery-2.1.0.min.js", "index.js"]
     }],
+    "icons": {
+        "19": "icon-19.png",
+        "64": "icon-64.png",
+        "128": "icon-128.png"
+    },
     "browser_action": {
         "default_icon": "icon.png"
     },
