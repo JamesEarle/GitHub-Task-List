@@ -17,13 +17,6 @@ function makeStateButton(state, isIssue) {
             " + state + "</span></span>";
 }
 
-// Might want to refresh the page when an input is checked to maintain the state buttons
-// this is buggy right now though
-// $("input:checkbox").change(function() {
-//     setTimeout(function() {}, 500)
-//     location.reload();
-// });
-
 // See below for PATCH API requests that can open/close issues dynamically
 // https://developer.github.com/v3/issues/
 
@@ -37,7 +30,6 @@ function collectLinks() {
     var checklist = document.querySelectorAll("a.issue-link");
 
     if (checklist.length != 0) {
-        // console.log("Fetching information on issues and pull requests...");
 
         // Collect children elements for the containing div
         for (var i = 0; i < checklist.length; i++) {
@@ -49,41 +41,25 @@ function collectLinks() {
                     success: function(data) {
                         // Find state button in requested HTML
                         var state = $(data).find("div.state")[0].classList[1];
+                        var span = "<span> </span>";
                         
                         switch (state) {
                             case "state-open":
-                                anchor.insertAdjacentHTML("beforebegin", makeStateButton("Open"));
-                                anchor.insertAdjacentHTML("beforebegin", "<span> </span>");
+                                anchor.insertAdjacentHTML("beforebegin", makeStateButton("Open") + span);
                                 break;
                             case "state-closed":
-                                anchor.insertAdjacentHTML("beforebegin", makeStateButton("Closed"));
-                                anchor.insertAdjacentHTML("beforebegin", "<span> </span>");
+                                anchor.insertAdjacentHTML("beforebegin", makeStateButton("Closed") + span);
                                 break;
                             case "state-merged":
-                                anchor.insertAdjacentHTML("beforebegin", makeStateButton("Merged"));
-                                anchor.insertAdjacentHTML("beforebegin", "<span> </span>");
+                                anchor.insertAdjacentHTML("beforebegin", makeStateButton("Merged") + span);
                                 break;
                         }
                     }
                 });
             })(checklist[i]);
         };
-        // console.log("Finished!");
     }
 }
-
-// window.onbeforeunload = function (e) {
-//             var e = e || window.event;
-//             var msg = "Do you really want to leave this page?"
-
-//             // For IE and Firefox
-//             if (e) {
-//                 e.returnValue = msg;
-//             }
-
-//             // For Safari / chrome
-//             return msg;
-//          };
 
 // Call once when we start
 $(document).ready(function() {
@@ -92,5 +68,5 @@ $(document).ready(function() {
 
 // And call again for every page navigation.
 document.addEventListener("pjax:end", function() {
-        collectLinks();
+    collectLinks();
 });
